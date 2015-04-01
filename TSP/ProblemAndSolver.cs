@@ -256,17 +256,18 @@ namespace TSP
             //init the state
             State initState = new State();
 
+            //MAY BE ABLKE TO USER OTHER HELPER FUNCTIONS==============================
             int minValue = int.MaxValue;
             double value = int.MaxValue;
 
             for (int i = 0; i < Cities.Length; i++)
             {
-                initState.pathThusFar.Add(new List<double>());
+                initState.costMatrix.Add(new List<double>());
                 for (int j = 0; j < Cities.Length; j++)
                 {
                     value = Cities[i].costToGetTo(Cities[j]);
                     //load up the cost matrix with the values
-                    initState.pathThusFar[i].Add(value);
+                    initState.costMatrix[i].Add(value);
 
                     //also look for the smallest value
                     if (value < minValue)
@@ -275,8 +276,26 @@ namespace TSP
             }
 
             //go reduce the matrix
-            reduceMatrix(initState.pathThusFar, minValue);
+            reduceMatrix(initState.costMatrix, minValue);
+            
             initState.cost += minValue;
+            //======================================================================
+            initState.cost += checkFor0(initState.costMatrix);
+
+            
+            for (int i = 0; i < initState.costMatrix.Count; i++)
+            {
+                //give the matrix and the row to investigate
+                int next = findNextCity(initState.costMatrix, i);
+                if (next != -1)
+                {
+                    //we need to add the beggining city
+                    initState.cityIndexes.Add(i);
+                    //and the next city that was just found
+                    initState.cityIndexes.Add(next);
+                    break;
+                }
+            }
 
             State bssf = BandB(initState);
 
@@ -302,6 +321,11 @@ namespace TSP
             // do a refresh. 
             Program.MainForm.Invalidate();
         }
+
+        private int findNextCity(List<List<double>> list, int i)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
         public void reduceMatrix(List<List<double>> matrix, double minValue)
@@ -310,16 +334,57 @@ namespace TSP
             {
                 for (int j = 0; j < Cities.Length; j++)
                 {
-                    matrix[i][j] -= minValue;
+                    if(matrix[i][j] != int.MaxValue)
+                        matrix[i][j] -= minValue;
                 }
             }
         }
 
         
-        private double checkFor0(List<List<double>> matrix)
+        private int checkFor0(List<List<double>> matrix)
         {
             //check each col and each row if there is a 0 in it. if not we need to reduce that col or row 
             //by that smallest number return it?
+
+            double rowMin;
+            double colMin;
+            int runningTotal = 0;
+            for (int i = 0; i < matrix.Count; i++)
+            {
+                rowMin = int.MaxValue;
+                colMin = int.MaxValue;
+                for (int j = 0; j < matrix[i].Count; j++)
+                {
+                    if (matrix[i][j] < rowMin)
+                        rowMin = matrix[i][j];
+
+                    if (matrix[j][i] < colMin)
+                        colMin = matrix[j][i];
+                }
+
+                //since the intersection is always int.max we dont have to worry about any changes in a row or col 
+                //affecting the col or row respectivly.
+                if (rowMin <= 0)
+                {
+                    for (int j = 0; j < matrix[i].Count; j++)
+                    {
+                        if (matrix[i][j] <= int.MaxValue)
+                            matrix[i][j] -= rowMin;
+                    }
+                }
+                if (colMin <= 0)
+                {
+                    for (int j = 0; j < matrix[i].Count; j++)
+                    {
+                        if (matrix[j][i] <= int.MaxValue)
+                            matrix[j][i] -= colMin;
+                    }
+                }
+
+                runningTotal += (int)rowMin + (int)colMin;
+            }
+
+            return runningTotal;
         }
 
         private State BandB(State input)
@@ -341,7 +406,7 @@ namespace TSP
 
                 if (temp.bound < bssf.cost)
                 {
-                    List<State> children = findSuccessors(temp);
+                    List<State> children = findSuccessors(temp,bssf.cost);
 
                     foreach (State child in children)
                     {
@@ -359,9 +424,29 @@ namespace TSP
 
         }
 
-        private List<State> findSuccessors(State temp)
+        private List<State> findSuccessors(State temp, int bssfCost)
         {
-            throw new NotImplementedException();
+            
+            List<State> children = new List<State>();
+
+            int rowToTry = temp.cityIndexes[temp.cityIndexes.Count - 1];
+            //get the last aded city. it is here we will look for the next 0
+            for (int i = 0; i < temp.costMatrix.Count; i++)
+            {                
+                if(temp.costMatrix[rowToTry][i] < int.MaxValue)
+                {
+                    State newChild = new State(temp);
+                    newChild.cityIndexes.Add(i);
+                    newChild.cost += checkFor0(newChild.costMatrix);
+
+                    if (newChild.cost <= bssfCost) //THIS SHOULD BE THE BOUND I THINK!!!!!!!!!!!!!!!!!!!
+                       children.Add(newChild);
+                }
+                else
+                    throw new Exception("Can't find a next city to go to");
+            }
+
+            return children;
         }
 
         private State quickSolution(State input)
@@ -375,7 +460,7 @@ namespace TSP
             //this favors states that are further along in their journey. AKA they have fewer cities left to visit
             public override int Compare(State x, State y)
             {
-                if (x.pathThusFar.Count == y.pathThusFar.Count)
+                if (x.cityIndexes.Count == y.cityIndexes.Count)
                 {
                     if (x.cost < y.cost)
                         return -1;
@@ -384,7 +469,7 @@ namespace TSP
                     else //equal
                         return 0;
                 }
-                else if (x.pathThusFar.Count < y.pathThusFar.Count)
+                else if (x.cityIndexes.Count < y.cityIndexes.Count)
                     return -1;
                 else
                     return 1;
@@ -397,15 +482,16 @@ namespace TSP
 
         private class State
         {
-            public List<List<double>> pathThusFar;
+            public List<List<double>> costMatrix;
             public int cost;
             public double bound;
-
+            public List<int> cityIndexes;
 
 
             public State()
             {
-                pathThusFar = new List<List<double>>();
+                costMatrix = new List<List<double>>();
+                cityIndexes = new List<int>();
             }
 
             public State(State state)
@@ -415,13 +501,18 @@ namespace TSP
                 this.bound = state.bound;
 
                 //do a deep copy of the cost matrix
-                for (int i = 0; i < state.pathThusFar.Count; i++)
+                for (int i = 0; i < state.costMatrix.Count; i++)
                 {
-                    this.pathThusFar[i] = new List<double>();
-                    for (int j = 0; j < state.pathThusFar[i].Count; j++)
+                    this.costMatrix[i] = new List<double>();
+                    for (int j = 0; j < state.costMatrix[i].Count; j++)
                     {
-                        this.pathThusFar[i].Add(state.pathThusFar[i][j]);
+                        this.costMatrix[i].Add(state.costMatrix[i][j]);
                     }
+                }
+
+                for (int i = 0; i < state.cityIndexes.Count; i++)
+                {
+                    cityIndexes.Add(state.cityIndexes[i]);
                 }
 
             }
