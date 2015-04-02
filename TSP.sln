@@ -1,9 +1,9 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TSP", "TSP\TSP.csproj", "{63EDB632-A2B8-4459-B15B-B54CD88AF866}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C5", "D:\Downloads\C5.src\C5\C5.csproj", "{D70489CD-ABDA-48FF-BD1E-BE3F7495BE71}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C5", "..\..\..\Desktop\Winter 2015\CS 312\C5.src\C5\C5.csproj", "{D70489CD-ABDA-48FF-BD1E-BE3F7495BE71}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

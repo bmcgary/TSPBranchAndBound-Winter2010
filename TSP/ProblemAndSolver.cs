@@ -5,7 +5,7 @@ using System.Text;
 using System.Drawing;
 using System.Timers;
 using C5;
-
+//BLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAINE
 namespace TSP
 {
     class ProblemAndSolver

@@ -112,8 +112,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="D:\Downloads\C5.src\C5\C5.csproj">
-      <Project>{D70489CD-ABDA-48FF-BD1E-BE3F7495BE71}</Project>
+    <ProjectReference Include="..\..\..\..\Desktop\Winter 2015\CS 312\C5.src\C5\C5.csproj">
+      <Project>{d70489cd-abda-48ff-bd1e-be3f7495be71}</Project>
       <Name>C5</Name>
     </ProjectReference>
   </ItemGroup>
