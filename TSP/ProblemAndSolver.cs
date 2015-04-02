@@ -254,6 +254,10 @@ namespace TSP
             timer.Start();
             //branch and bound
             //init the state
+            TSPSolution initSolution;
+
+            initSolution = getInitialSolution();        //here is your initial solution...fool.
+
             State initState = new State();
 
             //MAY BE ABLKE TO USER OTHER HELPER FUNCTIONS==============================
@@ -320,6 +324,49 @@ namespace TSP
             Program.MainForm.tbCostOfTour.Text = " " + bssf.cost;
             // do a refresh. 
             Program.MainForm.Invalidate();
+        }
+
+        private TSPSolution getInitialSolution()
+        {
+            List<City> thePath = new List<City>();
+            List<City> gonnaDoThat = new List<City>();
+
+            for (int i = 0; i < Cities.Length; i++) //put the cities into a list that is more easily manipulated
+            {
+                gonnaDoThat.Add(Cities[i]);
+            }
+
+            thePath.Add(gonnaDoThat[0]);    //start at the first city
+            gonnaDoThat.Remove(gonnaDoThat[0]);     //remove first city from cities to be searched
+
+            while (gonnaDoThat.Count != 0)
+            {
+                int minCostIndex = findMinIndex(gonnaDoThat, thePath[thePath.Count - 1]); //find the index of the closest city
+                thePath.Add(gonnaDoThat[minCostIndex]);                                     //add closest city to path
+                gonnaDoThat.Remove(gonnaDoThat[minCostIndex]);                              //remove that city from cities still to be searched
+            }
+
+            ArrayList path = new ArrayList();
+            for (int i = 0; i < thePath.Count; i++)
+            {
+                path.Add(thePath[i]);
+            }
+            TSPSolution solution = new TSPSolution(path);
+
+            return solution;
+        }
+
+        private int findMinIndex(List<City> cities, City currentCity)
+        {
+            int min = int.MaxValue;
+            int minIndex=0;
+            for (int i = 0; i < cities.Count; i++)
+            {
+                if (currentCity.costToGetTo(cities[i]) < min)
+                    minIndex = i;
+            }
+
+            return minIndex;
         }
 
         private int findNextCity(List<List<double>> list, int i)
