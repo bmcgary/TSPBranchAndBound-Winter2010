@@ -454,7 +454,7 @@ namespace TSP
             throw new NotImplementedException();
         }
 
-        public class myCompare : System.Collections.Generic.Comparer<State>
+        private class myCompare : System.Collections.Generic.Comparer<State>
         {
 
             //this favors states that are further along in their journey. AKA they have fewer cities left to visit

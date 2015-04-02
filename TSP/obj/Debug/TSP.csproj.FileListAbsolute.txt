@@ -12,3 +12,14 @@ C:\Users\User\Documents\TSPBranchAndBound-Winter2010\TSP\bin\Debug\TSP.exe.confi
 C:\Users\User\Documents\TSPBranchAndBound-Winter2010\TSP\obj\Debug\TSP.exe
 C:\Users\User\Documents\TSPBranchAndBound-Winter2010\TSP\obj\Debug\TSP.pdb
 C:\Users\Ray\Documents\GitHub\TSPBranchAndBound-Winter2010\TSP\bin\Debug\TSP.exe.config
+C:\Users\Ray\Documents\GitHub\TSPBranchAndBound-Winter2010\TSP\obj\Debug\TSP.csprojResolveAssemblyReference.cache
+C:\Users\Ray\Documents\GitHub\TSPBranchAndBound-Winter2010\TSP\obj\Debug\TSP.Form1.resources
+C:\Users\Ray\Documents\GitHub\TSPBranchAndBound-Winter2010\TSP\obj\Debug\TSP.Properties.Resources.resources
+C:\Users\Ray\Documents\GitHub\TSPBranchAndBound-Winter2010\TSP\obj\Debug\TSP.csproj.GenerateResource.Cache
+C:\Users\Ray\Documents\GitHub\TSPBranchAndBound-Winter2010\TSP\bin\Debug\TSP.exe
+C:\Users\Ray\Documents\GitHub\TSPBranchAndBound-Winter2010\TSP\bin\Debug\TSP.pdb
+C:\Users\Ray\Documents\GitHub\TSPBranchAndBound-Winter2010\TSP\bin\Debug\C5.dll
+C:\Users\Ray\Documents\GitHub\TSPBranchAndBound-Winter2010\TSP\bin\Debug\C5.pdb
+C:\Users\Ray\Documents\GitHub\TSPBranchAndBound-Winter2010\TSP\bin\Debug\C5.xml
+C:\Users\Ray\Documents\GitHub\TSPBranchAndBound-Winter2010\TSP\obj\Debug\TSP.exe
+C:\Users\Ray\Documents\GitHub\TSPBranchAndBound-Winter2010\TSP\obj\Debug\TSP.pdb
