@@ -35,6 +35,7 @@ namespace TSP
             /// <returns></returns>
             public double costOfRoute()
             {
+
                 // go through each edge in the route and add up the cost. 
                 int x;
                 City here;
@@ -280,28 +281,34 @@ namespace TSP
             }
 
             //go reduce the matrix
-            reduceMatrix(initState.costMatrix, minValue);
+            reduceInitialMatrix(initState.costMatrix, minValue);
             
-            initState.cost += minValue;
+            //add that value to the lower bound
+            initState.bound += minValue;
             //======================================================================
-            initState.cost += checkFor0(initState.costMatrix);
+
+            //the initState is updated when a better solution is found. When we return from
+            // BandB() just convert initState (which is the BSSF in State form) to TSPSoltion. 
+            BandB(initState);
+            
+            
 
             
-            for (int i = 0; i < initState.costMatrix.Count; i++)
-            {
-                //give the matrix and the row to investigate
-                int next = findNextCity(initState.costMatrix, i);
-                if (next != -1)
-                {
-                    //we need to add the beggining city
-                    initState.cityIndexes.Add(i);
-                    //and the next city that was just found
-                    initState.cityIndexes.Add(next);
-                    break;
-                }
-            }
+            //for (int i = 0; i < initState.costMatrix.Count; i++)
+            //{
+            //    give the matrix and the row to investigate
+            //    int next = findNextCity(initState.costMatrix, i);
+            //    if (next != -1)
+            //    {
+            //        we need to add the beggining city
+            //        initState.cityIndexes.Add(i);
+            //        and the next city that was just found
+            //        initState.cityIndexes.Add(next);
+            //        break;
+            //    }
+            //}
 
-            State bssf = BandB(initState);
+            
 
             //throw the bssf on the screen
 
@@ -375,7 +382,7 @@ namespace TSP
         }
         #endregion
 
-        public void reduceMatrix(List<List<double>> matrix, double minValue)
+        public void reduceInitialMatrix(List<List<double>> matrix, double minValue)
         {
             for (int i = 0; i < Cities.Length; i++)
             {
@@ -391,7 +398,8 @@ namespace TSP
         private int checkFor0(List<List<double>> matrix)
         {
             //check each col and each row if there is a 0 in it. if not we need to reduce that col or row 
-            //by that smallest number return it?
+            //Keep track of all the reducing done and return it. This is the delta that needs to be added to the 
+            //states bound
 
             double rowMin;
             double colMin;
@@ -411,7 +419,7 @@ namespace TSP
 
                 //since the intersection is always int.max we dont have to worry about any changes in a row or col 
                 //affecting the col or row respectivly.
-                if (rowMin <= 0)
+                if (rowMin > 0) //only reduce the row if we need to. if the min is 0 dont worry about it
                 {
                     for (int j = 0; j < matrix[i].Count; j++)
                     {
@@ -419,7 +427,7 @@ namespace TSP
                             matrix[i][j] -= rowMin;
                     }
                 }
-                if (colMin <= 0)
+                if (colMin > 0) //only reduce the col if we need to. if the min is 0 dont worry about it
                 {
                     for (int j = 0; j < matrix[i].Count; j++)
                     {
@@ -428,77 +436,78 @@ namespace TSP
                     }
                 }
 
-                runningTotal += (int)rowMin + (int)colMin;
+                runningTotal += (int)rowMin + (int)colMin; //this is what needs to be added to the bound.
             }
 
             return runningTotal;
         }
 
-        private State BandB(State input)
+        private void BandB(State initState)
         {
 
-            State state = new State(input);
-
-            State bssf = quickSolution(input);
+            State state = new State(initState);
 
            //myCompare compare = new myCompare(State);
             IntervalHeap<State> agenda = new IntervalHeap<State>(new myCompare());
 
-            agenda.Add(input);
+            agenda.Add(initState);
 
-            while (!agenda.IsEmpty && timer.Enabled && bssf.cost != agenda.FindMin().bound)
+            while (!agenda.IsEmpty && timer.Enabled && initState.bound != agenda.FindMin().bound)
             {
                 State temp = agenda.FindMin();
                 agenda.DeleteMin();
 
-                if (temp.bound < bssf.cost)
+                if (temp.bound < initState.bound)
                 {
-                    List<State> children = findSuccessors(temp,bssf.cost);
+                    List<State> children = findSuccessors(temp,initState.bound);
 
                     foreach (State child in children)
                     {
                         if (timer.Enabled)
                             break; //were done return the BSSF
-                        if (child.bound < bssf.cost)
-                            bssf = child;
-                        else
+                        
+                        if (Cities.Length == child.cityIndexes.Count) //all the cities are there and so this is a solution
+                        {
+                            //convert child to TSPSoltuion
+                            //check its cost, if its better than initState replace initState
+                            //else throw it out.
+                        }
+
+                        //only add the children that have a chance.
+                        if (child.bound < initState.bound) //initState IS bssf in State form (not TSPSolution form)
                             agenda.Add(child);
+                       // else
+                            
                     }
                 }
             }
 
-            return bssf;
+            return;
 
         }
 
-        private List<State> findSuccessors(State temp, int bssfCost)
+        private List<State> findSuccessors(State temp, double bssfBound)
         {
-            
             List<State> children = new List<State>();
 
             int rowToTry = temp.cityIndexes[temp.cityIndexes.Count - 1];
-            //get the last aded city. it is here we will look for the next 0
+            //get the last aded city. it is here we will look for any non int.MAX entries
             for (int i = 0; i < temp.costMatrix.Count; i++)
             {                
                 if(temp.costMatrix[rowToTry][i] < int.MaxValue)
                 {
                     State newChild = new State(temp);
                     newChild.cityIndexes.Add(i);
-                    newChild.cost += checkFor0(newChild.costMatrix);
+                    newChild.bound += checkFor0(newChild.costMatrix);
 
-                    if (newChild.cost <= bssfCost) //THIS SHOULD BE THE BOUND I THINK!!!!!!!!!!!!!!!!!!!
+                    if (newChild.bound <= bssfBound) //only add to children if its worth it
                        children.Add(newChild);
                 }
-                else
-                    throw new Exception("Can't find a next city to go to");
+               // else
+               //     throw new Exception("Can't find a next city to go to");
             }
 
             return children;
-        }
-
-        private State quickSolution(State input)
-        {
-            throw new NotImplementedException();
         }
 
         private class myCompare : System.Collections.Generic.Comparer<State>
@@ -509,9 +518,9 @@ namespace TSP
             {
                 if (x.cityIndexes.Count == y.cityIndexes.Count)
                 {
-                    if (x.cost < y.cost)
+                    if (x.bound < y.bound)
                         return -1;
-                    else if (x.cost > y.cost)
+                    else if (x.bound > y.bound)
                         return 1;
                     else //equal
                         return 0;
