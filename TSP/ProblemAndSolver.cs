@@ -246,7 +246,7 @@ namespace TSP
         /// </summary>
         /// 
 
-        Timer timer = new Timer(6000000000000000000); //set the interval for 60 seconds
+        Timer timer = new Timer(60000); //set the interval for 60 seconds
 
         public void solveProblem()
         {
@@ -515,7 +515,7 @@ namespace TSP
 
                     }
                 }
-            } while (!agenda.IsEmpty && timer.Enabled /*&& initState.bound != agenda.FindMin().bound*/);
+            } while (!agenda.IsEmpty && timer.Enabled && initState.bound != agenda.FindMin().bound);
 
             return bssf;
 
