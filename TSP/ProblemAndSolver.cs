@@ -250,8 +250,8 @@ namespace TSP
 
         public void solveProblem()
         {
-
-            timer.AutoReset = true;
+            DateTime time = DateTime.Now;
+            timer.AutoReset = false;
             timer.Start();
             //branch and bound
             //init the state
@@ -270,13 +270,16 @@ namespace TSP
                 initState.costMatrix.Add(new List<double>());
                 for (int j = 0; j < Cities.Length; j++)
                 {
-                    value = Cities[i].costToGetTo(Cities[j]);
+                    if (i == j)
+                        value = int.MaxValue;
+                    else
+                        value = Cities[i].costToGetTo(Cities[j]);
                     //load up the cost matrix with the values
                     initState.costMatrix[i].Add(value);
 
                     //also look for the smallest value
                     if (value < minValue)
-                        value = minValue;
+                        minValue = (int)value;
                 }
             }
 
@@ -286,10 +289,10 @@ namespace TSP
             //add that value to the lower bound
             initState.bound += minValue;
             //======================================================================
-
+            initState.bound += checkFor0(initState.costMatrix);
             //the initState is updated when a better solution is found. When we return from
             // BandB() just convert initState (which is the BSSF in State form) to TSPSoltion. 
-            BandB(initState);
+            bssf = BandB(initState, initSolution);
             
             
 
@@ -327,8 +330,9 @@ namespace TSP
             //}
             // call this the best solution so far.  bssf is the route that will be drawn by the Draw method. 
            // bssf = new TSPSolution(Route);
+            Program.MainForm.tbElapsedTime.Text = (DateTime.Now - time).ToString();
             // update the cost of the tour. 
-            Program.MainForm.tbCostOfTour.Text = " " + bssf.cost;
+            Program.MainForm.tbCostOfTour.Text = " " + initSolution.costOfRoute().ToString();
             // do a refresh. 
             Program.MainForm.Invalidate();
         }
@@ -365,12 +369,15 @@ namespace TSP
 
         private int findMinIndex(List<City> cities, City currentCity)
         {
-            int min = int.MaxValue;
+            double min = int.MaxValue;
             int minIndex=0;
             for (int i = 0; i < cities.Count; i++)
             {
                 if (currentCity.costToGetTo(cities[i]) < min)
+                {
+                    min = currentCity.costToGetTo(cities[i]);
                     minIndex = i;
+                }
             }
 
             return minIndex;
@@ -395,7 +402,7 @@ namespace TSP
         }
 
         
-        private int checkFor0(List<List<double>> matrix)
+        private double checkFor0(List<List<double>> matrix)
         {
             //check each col and each row if there is a 0 in it. if not we need to reduce that col or row 
             //Keep track of all the reducing done and return it. This is the delta that needs to be added to the 
@@ -403,7 +410,7 @@ namespace TSP
 
             double rowMin;
             double colMin;
-            int runningTotal = 0;
+            double runningTotal = 0;
             for (int i = 0; i < matrix.Count; i++)
             {
                 rowMin = int.MaxValue;
@@ -423,7 +430,7 @@ namespace TSP
                 {
                     for (int j = 0; j < matrix[i].Count; j++)
                     {
-                        if (matrix[i][j] <= int.MaxValue)
+                        if (matrix[i][j] < int.MaxValue)
                             matrix[i][j] -= rowMin;
                     }
                 }
@@ -431,7 +438,7 @@ namespace TSP
                 {
                     for (int j = 0; j < matrix[i].Count; j++)
                     {
-                        if (matrix[j][i] <= int.MaxValue)
+                        if (matrix[j][i] < int.MaxValue)
                             matrix[j][i] -= colMin;
                     }
                 }
@@ -442,32 +449,52 @@ namespace TSP
             return runningTotal;
         }
 
-        private void BandB(State initState)
+        private TSPSolution BandB(State initState, TSPSolution bssf)
         {
 
-            State state = new State(initState);
 
+
+            initState.cityIndexes.Add(0); //add City[0] to the indexes;
+            for (int i = 0; i < initState.costMatrix.Count; i++)
+            {
+                initState.costMatrix[i][0] = int.MaxValue;
+            }
            //myCompare compare = new myCompare(State);
             IntervalHeap<State> agenda = new IntervalHeap<State>(new myCompare());
 
             agenda.Add(initState);
 
-            while (!agenda.IsEmpty && timer.Enabled && initState.bound != agenda.FindMin().bound)
+            do
             {
                 State temp = agenda.FindMin();
                 agenda.DeleteMin();
 
-                if (temp.bound < initState.bound)
+                if (temp.bound <= initState.bound)
                 {
-                    List<State> children = findSuccessors(temp,initState.bound);
+                    List<State> children = findSuccessors(temp, initState.bound);
 
                     foreach (State child in children)
                     {
-                        if (timer.Enabled)
+                        if (!timer.Enabled)
                             break; //were done return the BSSF
-                        
+
                         if (Cities.Length == child.cityIndexes.Count) //all the cities are there and so this is a solution
                         {
+                            ArrayList tempRoute = new ArrayList();
+                            foreach (int i in child.cityIndexes)
+                            {
+                                tempRoute.Add(Cities[i]);
+                            }
+
+                            TSPSolution tempSolution = new TSPSolution(tempRoute);
+
+
+                            if (tempSolution.costOfRoute() < bssf.costOfRoute())
+                            {
+                                bssf = tempSolution;
+                                initState = child;
+                            }
+
                             //convert child to TSPSoltuion
                             //check its cost, if its better than initState replace initState
                             //else throw it out.
@@ -476,13 +503,13 @@ namespace TSP
                         //only add the children that have a chance.
                         if (child.bound < initState.bound) //initState IS bssf in State form (not TSPSolution form)
                             agenda.Add(child);
-                       // else
-                            
+                        // else
+
                     }
                 }
-            }
+            } while (!agenda.IsEmpty && timer.Enabled && initState.bound != agenda.FindMin().bound);
 
-            return;
+            return bssf;
 
         }
 
@@ -496,18 +523,33 @@ namespace TSP
             {                
                 if(temp.costMatrix[rowToTry][i] < int.MaxValue)
                 {
-                    State newChild = new State(temp);
-                    newChild.cityIndexes.Add(i);
-                    newChild.bound += checkFor0(newChild.costMatrix);
+                    if (i != rowToTry)
+                    {
+                        State newChild = new State(temp);
+                        newChild.cityIndexes.Add(i);
+                        fillWithInf(newChild.costMatrix, rowToTry, i);
+                        newChild.bound += checkFor0(newChild.costMatrix);
 
-                    if (newChild.bound <= bssfBound) //only add to children if its worth it
-                       children.Add(newChild);
+                        if (newChild.bound <= bssfBound) //only add to children if its worth it
+                            children.Add(newChild);
+                    }
                 }
                // else
                //     throw new Exception("Can't find a next city to go to");
             }
 
             return children;
+        }
+
+        private void fillWithInf(List<List<double>> list, int row, int col)
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                list[row][i] = int.MaxValue;
+                list[i][col] = int.MaxValue;
+            }
+
+
         }
 
         private class myCompare : System.Collections.Generic.Comparer<State>
@@ -526,9 +568,9 @@ namespace TSP
                         return 0;
                 }
                 else if (x.cityIndexes.Count < y.cityIndexes.Count)
-                    return -1;
-                else
                     return 1;
+                else
+                    return -1;
             }
         }
 
@@ -548,6 +590,8 @@ namespace TSP
             {
                 costMatrix = new List<List<double>>();
                 cityIndexes = new List<int>();
+                bound = 0;
+                cost = 0;
             }
 
             public State(State state)
@@ -559,7 +603,7 @@ namespace TSP
                 //do a deep copy of the cost matrix
                 for (int i = 0; i < state.costMatrix.Count; i++)
                 {
-                    this.costMatrix[i] = new List<double>();
+                    this.costMatrix.Add(new List<double>());
                     for (int j = 0; j < state.costMatrix[i].Count; j++)
                     {
                         this.costMatrix[i].Add(state.costMatrix[i][j]);
