@@ -246,7 +246,7 @@ namespace TSP
         /// </summary>
         /// 
 
-        Timer timer = new Timer(60000); //set the interval for 60 seconds
+        Timer timer = new Timer(6000000000000000000); //set the interval for 60 seconds
 
         public void solveProblem()
         {
@@ -332,7 +332,7 @@ namespace TSP
            // bssf = new TSPSolution(Route);
             Program.MainForm.tbElapsedTime.Text = (DateTime.Now - time).ToString();
             // update the cost of the tour. 
-            Program.MainForm.tbCostOfTour.Text = " " + initSolution.costOfRoute().ToString();
+            Program.MainForm.tbCostOfTour.Text = " " + bssf.costOfRoute().ToString();
             // do a refresh. 
             Program.MainForm.Invalidate();
         }
