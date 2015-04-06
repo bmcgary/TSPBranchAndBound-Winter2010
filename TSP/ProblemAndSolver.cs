@@ -426,7 +426,7 @@ namespace TSP
 
                 //since the intersection is always int.max we dont have to worry about any changes in a row or col 
                 //affecting the col or row respectivly.
-                if (rowMin > 0) //only reduce the row if we need to. if the min is 0 dont worry about it
+                if (rowMin > 0 && rowMin < int.MaxValue) //only reduce the row if we need to. if the min is 0 dont worry about it
                 {
                     for (int j = 0; j < matrix[i].Count; j++)
                     {
@@ -434,7 +434,7 @@ namespace TSP
                             matrix[i][j] -= rowMin;
                     }
                 }
-                if (colMin > 0) //only reduce the col if we need to. if the min is 0 dont worry about it
+                if (colMin > 0 && colMin < int.MaxValue) //only reduce the col if we need to. if the min is 0 dont worry about it
                 {
                     for (int j = 0; j < matrix[i].Count; j++)
                     {
@@ -443,7 +443,10 @@ namespace TSP
                     }
                 }
 
-                runningTotal += (int)rowMin + (int)colMin; //this is what needs to be added to the bound.
+                if (rowMin < int.MaxValue)
+                    runningTotal += (int)rowMin;
+                if (colMin < int.MaxValue)
+                    runningTotal += (int)colMin; //this is what needs to be added to the bound.
             }
 
             return runningTotal;
@@ -462,6 +465,8 @@ namespace TSP
            //myCompare compare = new myCompare(State);
             IntervalHeap<State> agenda = new IntervalHeap<State>(new myCompare());
 
+            initState.cost = (int)bssf.costOfRoute();
+
             agenda.Add(initState);
 
             do
@@ -469,9 +474,9 @@ namespace TSP
                 State temp = agenda.FindMin();
                 agenda.DeleteMin();
 
-                if (temp.bound <= initState.bound)
+                if (temp.bound <= initState.cost)
                 {
-                    List<State> children = findSuccessors(temp, initState.bound);
+                    List<State> children = findSuccessors(temp, initState.cost);
 
                     foreach (State child in children)
                     {
@@ -493,6 +498,7 @@ namespace TSP
                             {
                                 bssf = tempSolution;
                                 initState = child;
+                                initState.cost = (int)bssf.costOfRoute();
                             }
 
                             //convert child to TSPSoltuion
@@ -501,19 +507,21 @@ namespace TSP
                         }
 
                         //only add the children that have a chance.
-                        if (child.bound < initState.bound) //initState IS bssf in State form (not TSPSolution form)
+                        if (child.bound < initState.cost) //initState IS bssf in State form (not TSPSolution form)
+                        {
                             agenda.Add(child);
+                        }
                         // else
 
                     }
                 }
-            } while (!agenda.IsEmpty && timer.Enabled && initState.bound != agenda.FindMin().bound);
+            } while (!agenda.IsEmpty && timer.Enabled /*&& initState.bound != agenda.FindMin().bound*/);
 
             return bssf;
 
         }
 
-        private List<State> findSuccessors(State temp, double bssfBound)
+        private List<State> findSuccessors(State temp, double bssfCost)
         {
             List<State> children = new List<State>();
 
@@ -530,7 +538,7 @@ namespace TSP
                         fillWithInf(newChild.costMatrix, rowToTry, i);
                         newChild.bound += checkFor0(newChild.costMatrix);
 
-                        if (newChild.bound <= bssfBound) //only add to children if its worth it
+                       // if (newChild.bound <= bssfCost) //only add to children if its worth it
                             children.Add(newChild);
                     }
                 }
