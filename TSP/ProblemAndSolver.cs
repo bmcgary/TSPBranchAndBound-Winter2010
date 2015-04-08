@@ -257,6 +257,9 @@ namespace TSP
             //init the state
             TSPSolution initSolution;
 
+           // bssf = tempFindSolution();
+
+            
             initSolution = getInitialSolution();        //here is your initial solution...fool.
 
             State initState = new State();
@@ -319,7 +322,7 @@ namespace TSP
 
 
 
-
+            
 
             //int x;
             //Route = new ArrayList();
@@ -335,6 +338,16 @@ namespace TSP
             Program.MainForm.tbCostOfTour.Text = " " + bssf.costOfRoute().ToString();
             // do a refresh. 
             Program.MainForm.Invalidate();
+        }
+
+        private TSPSolution tempFindSolution()
+        {
+            ArrayList route = new ArrayList();
+            for (int i = 0; i < Cities.Length; i++)
+            {
+                route.Add(Cities[i]);
+            }
+            return new TSPSolution(route);
         }
 
         private TSPSolution getInitialSolution()
@@ -458,10 +471,10 @@ namespace TSP
 
 
             initState.cityIndexes.Add(0); //add City[0] to the indexes;
-            for (int i = 0; i < initState.costMatrix.Count; i++)
-            {
-                initState.costMatrix[i][0] = int.MaxValue;
-            }
+        //    for (int i = 0; i < initState.costMatrix.Count; i++)
+        //    {
+        //        initState.costMatrix[i][0] = int.MaxValue;
+        //    }
            //myCompare compare = new myCompare(State);
             IntervalHeap<State> agenda = new IntervalHeap<State>(new myCompare());
 
@@ -474,7 +487,7 @@ namespace TSP
                 State temp = agenda.FindMin();
                 agenda.DeleteMin();
 
-                if (temp.bound <= initState.cost)
+                if (temp.bound < initState.cost)
                 {
                     List<State> children = findSuccessors(temp, initState.cost);
 
@@ -483,39 +496,42 @@ namespace TSP
                         if (!timer.Enabled)
                             break; //were done return the BSSF
 
-                        if (Cities.Length == child.cityIndexes.Count) //all the cities are there and so this is a solution
-                        {
-                            ArrayList tempRoute = new ArrayList();
-                            foreach (int i in child.cityIndexes)
-                            {
-                                tempRoute.Add(Cities[i]);
-                            }
-
-                            TSPSolution tempSolution = new TSPSolution(tempRoute);
-
-
-                            if (tempSolution.costOfRoute() < bssf.costOfRoute())
-                            {
-                                bssf = tempSolution;
-                                initState = child;
-                                initState.cost = (int)bssf.costOfRoute();
-                            }
-
-                            //convert child to TSPSoltuion
-                            //check its cost, if its better than initState replace initState
-                            //else throw it out.
-                        }
-
-                        //only add the children that have a chance.
                         if (child.bound < initState.cost) //initState IS bssf in State form (not TSPSolution form)
                         {
-                            agenda.Add(child);
-                        }
-                        // else
+                            if (Cities.Length == child.cityIndexes.Count) //all the cities are there and so this is a solution
+                            {
+                                ArrayList tempRoute = new ArrayList();
+                                foreach (int i in child.cityIndexes)
+                                {
+                                    tempRoute.Add(Cities[i]);
+                                }
 
+                                TSPSolution tempSolution = new TSPSolution(tempRoute);
+
+                                child.cost = (int)child.bound;
+                                if (tempSolution.costOfRoute() < bssf.costOfRoute())
+                                {
+                                    bssf = tempSolution;
+                                    initState = child;
+                                    initState.cost = (int)bssf.costOfRoute();
+                                
+                                }
+
+                                //convert child to TSPSoltuion
+                                //check its cost, if its better than initState replace initState
+                                //else throw it out.
+                            }
+
+                            //only add the children that have a chance.
+                            else
+                            {
+                                agenda.Add(child);
+                            }
+                            // else
+                          }
                     }
                 }
-            } while (!agenda.IsEmpty && timer.Enabled && initState.bound != agenda.FindMin().bound);
+            } while (!agenda.IsEmpty && timer.Enabled/* && initState.bound != agenda.FindMin().bound*/);
 
             return bssf;
 
@@ -527,6 +543,7 @@ namespace TSP
 
             int rowToTry = temp.cityIndexes[temp.cityIndexes.Count - 1];
             //get the last aded city. it is here we will look for any non int.MAX entries
+       //displayMatrix(temp.costMatrix, "find successors base");
             for (int i = 0; i < temp.costMatrix.Count; i++)
             {                
                 if(temp.costMatrix[rowToTry][i] < int.MaxValue)
@@ -534,9 +551,14 @@ namespace TSP
                     if (i != rowToTry)
                     {
                         State newChild = new State(temp);
+                //   displayMatrix(newChild.costMatrix, "new child before filling");
                         newChild.cityIndexes.Add(i);
+                        newChild.bound += newChild.costMatrix[rowToTry][i];
                         fillWithInf(newChild.costMatrix, rowToTry, i);
+                        //fill in the 0 col to prevent an early loop back
+                        newChild.costMatrix[i][0] = int.MaxValue;
                         newChild.bound += checkFor0(newChild.costMatrix);
+                 //  displayMatrix(newChild.costMatrix, "new child after filling");
 
                        // if (newChild.bound <= bssfCost) //only add to children if its worth it
                             children.Add(newChild);
@@ -547,6 +569,21 @@ namespace TSP
             }
 
             return children;
+        }
+
+        private void displayMatrix(List<List<double>> matrix, String message)
+        {
+            Console.WriteLine(message);
+            foreach (List<double> i in matrix)
+            {
+                foreach (double j in i)
+                {
+                    Console.Write("{0,-14}", j.ToString()
+                );
+                }
+                Console.WriteLine("\n");
+            }
+            Console.WriteLine("\n\n");
         }
 
         private void fillWithInf(List<List<double>> list, int row, int col)
