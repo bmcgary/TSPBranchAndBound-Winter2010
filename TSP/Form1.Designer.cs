@@ -32,6 +32,8 @@ namespace TSP
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.txtSeed = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripLabel5 = new System.Windows.Forms.ToolStripLabel();
+            this.lblProblem = new System.Windows.Forms.ToolStripLabel();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.btnRun = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -45,8 +47,12 @@ namespace TSP
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel4 = new System.Windows.Forms.ToolStripLabel();
             this.tbElapsedTime = new System.Windows.Forms.ToolStripTextBox();
-            this.toolStripLabel5 = new System.Windows.Forms.ToolStripLabel();
-            this.lblProblem = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripLabel6 = new System.Windows.Forms.ToolStripLabel();
+            this.tbMaxSize = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripLabel7 = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripTextBox1 = new System.Windows.Forms.ToolStripTextBox();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -70,23 +76,44 @@ namespace TSP
             this.tbCostOfTour,
             this.toolStripSeparator4,
             this.toolStripLabel4,
-            this.tbElapsedTime});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 467);
+            this.tbElapsedTime,
+            this.toolStripSeparator6,
+            this.toolStripLabel6,
+            this.tbMaxSize,
+            this.toolStripSeparator7,
+            this.toolStripLabel7,
+            this.toolStripTextBox1});
+            this.toolStrip1.Location = new System.Drawing.Point(0, 469);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(956, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(1212, 25);
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
             // toolStripLabel1
             // 
             this.toolStripLabel1.Name = "toolStripLabel1";
-            this.toolStripLabel1.Size = new System.Drawing.Size(31, 22);
+            this.toolStripLabel1.Size = new System.Drawing.Size(32, 22);
             this.toolStripLabel1.Text = "Seed";
             // 
             // txtSeed
             // 
             this.txtSeed.Name = "txtSeed";
             this.txtSeed.Size = new System.Drawing.Size(50, 25);
+            // 
+            // toolStripLabel5
+            // 
+            this.toolStripLabel5.Name = "toolStripLabel5";
+            this.toolStripLabel5.Size = new System.Drawing.Size(55, 22);
+            this.toolStripLabel5.Text = "Problem:";
+            // 
+            // lblProblem
+            // 
+            this.lblProblem.AutoSize = false;
+            this.lblProblem.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblProblem.Name = "lblProblem";
+            this.lblProblem.Size = new System.Drawing.Size(50, 22);
+            this.lblProblem.Text = "--";
+            this.lblProblem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // toolStripSeparator3
             // 
@@ -99,7 +126,7 @@ namespace TSP
             this.btnRun.Image = ((System.Drawing.Image)(resources.GetObject("btnRun.Image")));
             this.btnRun.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnRun.Name = "btnRun";
-            this.btnRun.Size = new System.Drawing.Size(30, 22);
+            this.btnRun.Size = new System.Drawing.Size(32, 22);
             this.btnRun.Text = "Run";
             this.btnRun.Click += new System.EventHandler(this.btnRun_Click);
             // 
@@ -113,7 +140,7 @@ namespace TSP
             this.bNewProblem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.bNewProblem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.bNewProblem.Name = "bNewProblem";
-            this.bNewProblem.Size = new System.Drawing.Size(72, 22);
+            this.bNewProblem.Size = new System.Drawing.Size(81, 22);
             this.bNewProblem.Text = "new problem";
             this.bNewProblem.Click += new System.EventHandler(this.bNewProblem_Click);
             // 
@@ -125,7 +152,7 @@ namespace TSP
             // toolStripLabel2
             // 
             this.toolStripLabel2.Name = "toolStripLabel2";
-            this.toolStripLabel2.Size = new System.Drawing.Size(67, 22);
+            this.toolStripLabel2.Size = new System.Drawing.Size(75, 22);
             this.toolStripLabel2.Text = "Problem Size";
             // 
             // tbProblemSize
@@ -143,7 +170,7 @@ namespace TSP
             // toolStripLabel3
             // 
             this.toolStripLabel3.Name = "toolStripLabel3";
-            this.toolStripLabel3.Size = new System.Drawing.Size(65, 22);
+            this.toolStripLabel3.Size = new System.Drawing.Size(70, 22);
             this.toolStripLabel3.Text = "Cost of tour";
             // 
             // tbCostOfTour
@@ -162,7 +189,7 @@ namespace TSP
             // toolStripLabel4
             // 
             this.toolStripLabel4.Name = "toolStripLabel4";
-            this.toolStripLabel4.Size = new System.Drawing.Size(53, 22);
+            this.toolStripLabel4.Size = new System.Drawing.Size(58, 22);
             this.toolStripLabel4.Text = "Solved in ";
             // 
             // tbElapsedTime
@@ -173,26 +200,45 @@ namespace TSP
             this.tbElapsedTime.Text = "--";
             this.tbElapsedTime.TextBoxTextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
-            // toolStripLabel5
+            // toolStripSeparator6
             // 
-            this.toolStripLabel5.Name = "toolStripLabel5";
-            this.toolStripLabel5.Size = new System.Drawing.Size(49, 22);
-            this.toolStripLabel5.Text = "Problem:";
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(6, 25);
             // 
-            // lblProblem
+            // toolStripLabel6
             // 
-            this.lblProblem.AutoSize = false;
-            this.lblProblem.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.lblProblem.Name = "lblProblem";
-            this.lblProblem.Size = new System.Drawing.Size(50, 22);
-            this.lblProblem.Text = "--";
-            this.lblProblem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.toolStripLabel6.Name = "toolStripLabel6";
+            this.toolStripLabel6.Size = new System.Drawing.Size(52, 22);
+            this.toolStripLabel6.Text = "Max Size";
+            // 
+            // tbMaxSize
+            // 
+            this.tbMaxSize.Name = "tbMaxSize";
+            this.tbMaxSize.ReadOnly = true;
+            this.tbMaxSize.Size = new System.Drawing.Size(100, 25);
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(6, 25);
+            // 
+            // toolStripLabel7
+            // 
+            this.toolStripLabel7.Name = "toolStripLabel7";
+            this.toolStripLabel7.Size = new System.Drawing.Size(57, 22);
+            this.toolStripLabel7.Text = "Time Left";
+            // 
+            // toolStripTextBox1
+            // 
+            this.toolStripTextBox1.Name = "toolStripTextBox1";
+            this.toolStripTextBox1.ReadOnly = true;
+            this.toolStripTextBox1.Size = new System.Drawing.Size(100, 25);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(956, 492);
+            this.ClientSize = new System.Drawing.Size(1212, 494);
             this.Controls.Add(this.toolStrip1);
             this.Name = "Form1";
             this.Text = "Traveling Sales Person";
@@ -225,6 +271,12 @@ namespace TSP
         public System.Windows.Forms.ToolStripTextBox tbElapsedTime;
         private System.Windows.Forms.ToolStripLabel toolStripLabel5;
         private System.Windows.Forms.ToolStripLabel lblProblem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel6;
+        public System.Windows.Forms.ToolStripTextBox tbMaxSize;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel7;
+        public System.Windows.Forms.ToolStripTextBox toolStripTextBox1;
 
 
 

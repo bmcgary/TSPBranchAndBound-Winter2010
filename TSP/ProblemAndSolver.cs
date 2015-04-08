@@ -297,45 +297,17 @@ namespace TSP
             // BandB() just convert initState (which is the BSSF in State form) to TSPSoltion. 
             bssf = BandB(initState, initSolution);
             
-            
 
-            
-            //for (int i = 0; i < initState.costMatrix.Count; i++)
-            //{
-            //    give the matrix and the row to investigate
-            //    int next = findNextCity(initState.costMatrix, i);
-            //    if (next != -1)
-            //    {
-            //        we need to add the beggining city
-            //        initState.cityIndexes.Add(i);
-            //        and the next city that was just found
-            //        initState.cityIndexes.Add(next);
-            //        break;
-            //    }
-            //}
-
-            
-
-            //throw the bssf on the screen
-
-
-
-
-
-            
-
-            //int x;
-            //Route = new ArrayList();
-            // this is the trivial solution. 
-            //for (x = 0; x < Cities.Length; x++)
-            //{
-            //    Route.Add(Cities[Cities.Length - x - 1]);
-            //}
             // call this the best solution so far.  bssf is the route that will be drawn by the Draw method. 
            // bssf = new TSPSolution(Route);
             Program.MainForm.tbElapsedTime.Text = (DateTime.Now - time).ToString();
             // update the cost of the tour. 
             Program.MainForm.tbCostOfTour.Text = " " + bssf.costOfRoute().ToString();
+
+            Program.MainForm.tbMaxSize.Text = spaceUsed.ToString();
+
+            //remainging time
+            Program.MainForm.toolStripTextBox1.Text = (60 - (DateTime.Now - time).TotalSeconds).ToString();
             // do a refresh. 
             Program.MainForm.Invalidate();
         }
@@ -465,9 +437,10 @@ namespace TSP
             return runningTotal;
         }
 
+        int spaceUsed;
         private TSPSolution BandB(State initState, TSPSolution bssf)
         {
-
+            spaceUsed = 0;
 
 
             initState.cityIndexes.Add(0); //add City[0] to the indexes;
@@ -481,6 +454,7 @@ namespace TSP
             initState.cost = (int)bssf.costOfRoute();
 
             agenda.Add(initState);
+            spaceUsed++;
 
             do
             {
@@ -526,6 +500,8 @@ namespace TSP
                             else
                             {
                                 agenda.Add(child);
+                                if (spaceUsed < agenda.Count)
+                                    spaceUsed = agenda.Count;
                             }
                             // else
                           }

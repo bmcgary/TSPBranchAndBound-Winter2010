@@ -82,6 +82,5 @@ namespace TSP
             GenerateProblem();
         }
 
-
     }
 }
