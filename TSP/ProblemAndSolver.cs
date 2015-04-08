@@ -5,7 +5,7 @@ using System.Text;
 using System.Drawing;
 using System.Timers;
 using C5;
-//BLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAINE
+
 namespace TSP
 {
     class ProblemAndSolver
@@ -257,14 +257,12 @@ namespace TSP
             //init the state
             TSPSolution initSolution;
 
-           // bssf = tempFindSolution();
-
             
-            initSolution = getInitialSolution();        //here is your initial solution...fool.
+            initSolution = getInitialSolution();        //here is your initial solution.
 
             State initState = new State();
 
-            //MAY BE ABLKE TO USER OTHER HELPER FUNCTIONS==============================
+            //MAY BE ABLE TO USER OTHER HELPER FUNCTIONS==============================
             int minValue = int.MaxValue;
             double value = int.MaxValue;
 
@@ -527,21 +525,19 @@ namespace TSP
                     if (i != rowToTry)
                     {
                         State newChild = new State(temp);
-                //   displayMatrix(newChild.costMatrix, "new child before filling");
+              
                         newChild.cityIndexes.Add(i);
                         newChild.bound += newChild.costMatrix[rowToTry][i];
                         fillWithInf(newChild.costMatrix, rowToTry, i);
                         //fill in the 0 col to prevent an early loop back
                         newChild.costMatrix[i][0] = int.MaxValue;
                         newChild.bound += checkFor0(newChild.costMatrix);
-                 //  displayMatrix(newChild.costMatrix, "new child after filling");
+           
 
-                       // if (newChild.bound <= bssfCost) //only add to children if its worth it
+                      
                             children.Add(newChild);
                     }
                 }
-               // else
-               //     throw new Exception("Can't find a next city to go to");
             }
 
             return children;
