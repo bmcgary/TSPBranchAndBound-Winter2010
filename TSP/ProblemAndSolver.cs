@@ -261,7 +261,7 @@ namespace TSP
             initSolution = getInitialSolution();        //here is your initial solution.
 
             State initState = new State();
-
+            
             //MAY BE ABLE TO USER OTHER HELPER FUNCTIONS==============================
             int minValue = int.MaxValue;
             double value = int.MaxValue;
@@ -295,7 +295,7 @@ namespace TSP
             // BandB() just convert initState (which is the BSSF in State form) to TSPSoltion. 
             bssf = BandB(initState, initSolution);
             
-
+            
             // call this the best solution so far.  bssf is the route that will be drawn by the Draw method. 
            // bssf = new TSPSolution(Route);
             Program.MainForm.tbElapsedTime.Text = (DateTime.Now - time).ToString();
@@ -486,7 +486,7 @@ namespace TSP
                                     bssf = tempSolution;
                                     initState = child;
                                     initState.cost = (int)bssf.costOfRoute();
-                                
+                                    initState.bound = initState.cost;
                                 }
 
                                 //convert child to TSPSoltuion
@@ -505,7 +505,7 @@ namespace TSP
                           }
                     }
                 }
-            } while (!agenda.IsEmpty && timer.Enabled/* && initState.bound != agenda.FindMin().bound*/);
+            } while (!agenda.IsEmpty && timer.Enabled && initState.bound != agenda.FindMin().bound);
 
             return bssf;
 
@@ -534,7 +534,7 @@ namespace TSP
                         newChild.bound += checkFor0(newChild.costMatrix);
            
 
-                      
+                      if(newChild.bound < bssfCost)
                             children.Add(newChild);
                     }
                 }
@@ -575,6 +575,7 @@ namespace TSP
             //this favors states that are further along in their journey. AKA they have fewer cities left to visit
             public override int Compare(State x, State y)
             {
+                
                 if (x.cityIndexes.Count == y.cityIndexes.Count)
                 {
                     if (x.bound < y.bound)
@@ -588,6 +589,7 @@ namespace TSP
                     return 1;
                 else
                     return -1;
+                 
             }
         }
 
